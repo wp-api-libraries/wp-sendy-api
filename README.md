@@ -1,0 +1,2 @@
+# wp-sendy-api
+A WordPress php library for the Sendy API.
