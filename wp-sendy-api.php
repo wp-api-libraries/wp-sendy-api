@@ -4,6 +4,17 @@
  *
  * @package WP-Sendy-API
  */
+ 
+/*
+* Plugin Name: WP Sendy API
+* Plugin URI: https://github.com/wp-api-libraries/wp-sendy-api
+* Description: Perform API requests to Sendy in WordPress.
+* Author: WP API Libraries
+* Version: 1.0.0
+* Author URI: https://wp-api-libraries.com
+* GitHub Plugin URI: https://github.com/wp-api-libraries/wp-sendy-api
+* GitHub Branch: master
+*/
 
 /* Exit if accessed directly */
 if ( ! defined( 'ABSPATH' ) ) { exit; }
@@ -47,109 +58,171 @@ if ( ! class_exists( 'SendyAPI' ) ) {
 		}
 
 		/**
-		 * Fetch the request from the API.
+		 * Subscribe function.
 		 *
-		 * @access private
-		 * @param mixed $request Request URL.
-		 * @return $body Body.
+		 * @access public
+		 * @param string $name (default: '') Name.
+		 * @param mixed $email Email.
+		 * @param mixed $list List.
+		 * @param mixed $boolean Boolean.
+		 * @return void
 		 */
-		private function fetch( $request ) {
-
-			$response = wp_remote_get( $request );
-			$code = wp_remote_retrieve_response_code( $response );
-
-			if ( 200 !== $code ) {
-				return new WP_Error( 'response-error', sprintf( __( 'Server response code: %d', 'text-domain' ), $code ) );
-			}
-
-			$body = wp_remote_retrieve_body( $response );
+		public function subscribe( $name = '', $email, $list, $boolean ) {
+			
+			//TODO: Support Custom Fields
+			$request = wp_remote_post( static::$install_url . '/subscribe', array(
+				'body' => array( 
+				'api_key' => static::$api_key, 
+				'name' => $name,
+				'email' => $email,
+				'list' => $list,
+				'boolean' => $boolean // set this to "true" so that you'll get a plain text response
+				) )
+			);
+			
+			$body = wp_remote_retrieve_body( $request );
 
 			return json_decode( $body );
 
 		}
 
 		/**
-		 * subscribe function.
+		 * Unsubscribe function.
 		 *
 		 * @access public
-		 * @param string $name (default: '')
-		 * @param mixed $email
-		 * @param mixed $list
-		 * @param mixed $boolean
-		 * @return void
-		 */
-		public function subscribe( $name = '', $email, $list, $boolean ) {
-
-		}
-
-		/**
-		 * unsubscribe function.
-		 *
-		 * @access public
-		 * @param mixed $email
-		 * @param mixed $list
-		 * @param mixed $boolean
+		 * @param mixed $email Email.
+		 * @param mixed $list List.
+		 * @param mixed $boolean Boolean.
 		 * @return void
 		 */
 		public function unsubscribe( $email, $list, $boolean ) {
+			
+			$request = wp_remote_post( static::$install_url . '/unsubscribe', array(
+				'body' => array( 
+				'api_key' => static::$api_key, 
+				'email' => $email,
+				'list' => $list,
+				'boolean' => $boolean // set this to "true" so that you'll get a plain text response
+				) )
+			);
+			
+			$body = wp_remote_retrieve_body( $request );
+
+			return json_decode( $body );
 
 		}
 
 
 		/**
-		 * delete_subscriber function.
+		 * Delete Subscriber
 		 *
 		 * @access public
-		 * @param mixed $list_id
-		 * @param mixed $email
+		 * @param mixed $list_id List ID.
+		 * @param mixed $email Email.
 		 * @return void
 		 */
 		public function delete_subscriber( $list_id, $email ) {
+			
+			$request = wp_remote_post( static::$install_url . '/api/subscribers/delete.php', array(
+				'body' => array( 
+				'api_key' => static::$api_key, 
+				'email' => $email,
+				'list_id' => $list_id 
+				) )
+			);
+			
+			$body = wp_remote_retrieve_body( $request );
+
+			return json_decode( $body );
 
 		}
 
 		/**
-		 * get_subscription_status function.
+		 * Get_subscription_status function.
 		 *
 		 * @access public
-		 * @param mixed $email
-		 * @param mixed $list_id
+		 * @param mixed $email Email.
+		 * @param mixed $list_id List ID.
 		 * @return void
 		 */
 		public function get_subscription_status( $email, $list_id ) {
+						
+			$request = wp_remote_post( static::$install_url . '/api/subscribers/ubscription-status.php', array(
+				'body' => array( 
+				'api_key' => static::$api_key, 
+				'email' => $email,
+				'list_id' => $list_id 
+				) )
+			);
+			
+			$body = wp_remote_retrieve_body( $request );
+
+			return json_decode( $body );
 
 		}
 
 		/**
-		 * get_subscriber_count function.
+		 * Get Subscriber Count.
 		 *
 		 * @access public
-		 * @param mixed $list_id
+		 * @param mixed $list_id List ID.
 		 * @return void
 		 */
 		public function get_subscriber_count( $list_id ) {
+			
+			$request = wp_remote_post( static::$install_url . '/api/subscribers/active-subscriber-count.php', array(
+				'body' => array( 
+				'api_key' => static::$api_key, 
+				'list_id' => $list_id ) )
+		 );
+			
+			$body = wp_remote_retrieve_body( $request );
 
+			return json_decode( $body );
 		}
 
 		/**
-		 * create_campaign function.
+		 * Create Campaign.
 		 *
 		 * @access public
-		 * @param mixed $from_name
-		 * @param mixed $from_email
-		 * @param mixed $reply_to
-		 * @param mixed $subject
-		 * @param mixed $plain_text
-		 * @param mixed $html_text
-		 * @param mixed $list_ids
-		 * @param mixed $brand_id
-		 * @param mixed $query_string
-		 * @param string $send_campaign (default: '0')
+		 * @param mixed $from_name From Name.
+		 * @param mixed $from_email From Email.
+		 * @param mixed $reply_to Reply To.
+		 * @param mixed $subject Subject.
+		 * @param mixed $plain_text Plain text.
+		 * @param mixed $html_text HTML text.
+		 * @param mixed $list_ids List IDs.
+		 * @param mixed $brand_id Brand ID.
+		 * @param mixed $query_string Query String.
+		 * @param string $send_campaign (default: '0') Send Campaign.
 		 * @return void
 		 */
 		public function create_campaign( $from_name, $from_email, $reply_to, $subject, $plain_text, $html_text, $list_ids, $brand_id, $query_string, $send_campaign = '0' ) {
+			
+			$request = wp_remote_post( static::$install_url . '/api/campaigns/create.php', array(
+				'body' => array( 
+				'api_key' => static::$api_key, 
+				'from_name' => $from_name,
+				'from_email' => $from_email,
+				'reply_to' => $reply_to,
+				'title' => $title,
+				'subject' => $subject,
+				'plain_text' => $plain_text,
+				'html_text' => $html_text,
+				'list_ids' => $list_ids,
+				'brand_id' => $brand_id,
+				'query_string' => $query_string,
+				'send_campaign' => $send_campaign,
+			) )
+			);
+			
+			$body = wp_remote_retrieve_body( $request );
+
+			return json_decode( $body );
 
 		}
+		
+		
 
 	}
 }
