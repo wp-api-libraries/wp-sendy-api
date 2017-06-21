@@ -157,7 +157,7 @@ if ( ! class_exists( 'SendyAPI' ) ) {
 			
 			$body = wp_remote_retrieve_body( $request );
 			
-			return json_decode( $body );
+			return $body;
 
 		}
 
