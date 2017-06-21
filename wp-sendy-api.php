@@ -147,7 +147,7 @@ if ( ! class_exists( 'SendyAPI' ) ) {
 		 */
 		public function get_subscription_status( $email, $list_id ) {
 						
-			$request = wp_remote_post( static::$install_url . '/api/subscribers/ubscription-status.php', array(
+			$request = wp_remote_post( static::$install_url . '/api/subscribers/subscription-status.php', array(
 				'body' => array( 
 				'api_key' => static::$api_key, 
 				'email' => $email,
@@ -156,7 +156,7 @@ if ( ! class_exists( 'SendyAPI' ) ) {
 			);
 			
 			$body = wp_remote_retrieve_body( $request );
-
+			
 			return json_decode( $body );
 
 		}
